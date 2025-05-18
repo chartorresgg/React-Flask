@@ -27,6 +27,19 @@ export default function UsuarioList({ recargar, onEditarUsuario  }) {
             <button onClick={() => onEditarUsuario(u)} style={{ marginLeft: '10px' }}>
               Editar
             </button>
+
+            <button
+  onClick={async () => {
+    if (confirm(`¿Estás seguro de eliminar a ${u.nombre}?`)) {
+      await UsuarioService.eliminarUsuario(u.id_usuario);
+      setUsuarios(usuarios.filter(user => user.id_usuario !== u.id_usuario));
+    }
+  }}
+  style={{ marginLeft: '10px', color: 'red' }}
+>
+  Eliminar
+</button>
+
           </li>
         ))}
       </ul>

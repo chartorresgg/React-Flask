@@ -27,6 +27,18 @@ export default function DeporteList({ recargar, onEditarDeporte }) {
             <button onClick={() => onEditarDeporte(deporte)} style={{ marginLeft: '10px' }}>
               Editar
             </button>
+<button
+  onClick={async () => {
+    if (confirm(`¿Eliminar deporte "${deporte.nombre_deporte}"?`)) {
+      await DeporteService.deleteDeporte(deporte.id_deporte);
+      setDeportes(deportes.filter(d => d.id_deporte !== deporte.id_deporte));
+    }
+  }}
+  style={{ marginLeft: '10px', color: 'red' }}
+>
+  Eliminar
+</button>
+            
           </li>
         ))}
       </ul>
