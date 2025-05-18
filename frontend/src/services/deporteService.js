@@ -1,30 +1,38 @@
 const API_BASE_URL = 'http://localhost:5000'
 
-export const getDeportes = async () => {
+const DeporteService = {
+ getDeportes: async () => {
   const res = await fetch(`${API_BASE_URL}/getSports`);
-  return res.json();
-};
+  const contentType = res.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    return await res.json();
+  } else {
+    const text = await res.text();
+    console.error('Error: respuesta no es JSON:', text);
+    throw new Error('Respuesta no válida desde el servidor');
+  }
+},
 
-export const createDeporte = async (deporte) => {
+createDeporte: async (deporte) => {
   const res = await fetch(`${API_BASE_URL}/createSport`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(deporte),
   });
   return res.json();
-};
+},
 
-export const updateDeporte = async (id, deporte) => {
-  const deporteConId = { id_deporte: id, ...deporte };
+updateDeporte: async (deporte) => {
   const res = await fetch(`${API_BASE_URL}/updateSport`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(deporteConId),
+    body: JSON.stringify(deporte),
   });
   return res.json();
-};
+},
 
-export const deleteDeporte = async (id) => {
+
+deleteDeporte: async (id) => {
   const res = await fetch(`${API_BASE_URL}/deleteSport`, {
     method: 'DELETE',
     headers: {
@@ -39,4 +47,7 @@ export const deleteDeporte = async (id) => {
     return { error: 'No se pudo eliminar el deporte' };
   }
   return res.json();
+}
 };
+
+export default DeporteService;

@@ -1,14 +1,18 @@
-// src/components/UsuarioForm.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import UsuarioService from '../services/usuarioService';
 
-export default function UsuarioForm({ onUsuarioCreado }) {
+export default function UsuarioForm({ onUsuarioCreado, usuarioEditar, limpiarEdicion }) {
   const [usuario, setUsuario] = useState({
     nombre: '',
     correo: '',
     contraseña: '',
     saldo_disponible: 0,
   });
+useEffect(() => {
+    if (usuarioEditar) {
+      setUsuario(usuarioEditar);
+    }
+  }, [usuarioEditar]);
 
   const handleChange = (e) =>
     setUsuario({ ...usuario, [e.target.name]: e.target.value });
@@ -17,21 +21,28 @@ export default function UsuarioForm({ onUsuarioCreado }) {
     e.preventDefault();
 
     try {
-      const nuevoUsuario = await UsuarioService.crearUsuario(usuario);
-      alert('Usuario creado');
+      if (usuario.id_usuario) {
+        await UsuarioService.actualizarUsuario(usuario.id_usuario, usuario);
+        alert('Usuario actualizado');
+        limpiarEdicion(); // salir del modo edición
+      } else {
+        await UsuarioService.crearUsuario(usuario);
+        alert('Usuario creado');
+      }
+
       setUsuario({ nombre: '', correo: '', contraseña: '', saldo_disponible: 0 });
 
       if (onUsuarioCreado) {
-        onUsuarioCreado(nuevoUsuario); // notifica al padre
+        onUsuarioCreado();
       }
     } catch (error) {
-      console.error('Error al crear usuario:', error);
+      console.error('Error al crear/actualizar usuario:', error);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
-      <h2>Crear Usuario</h2>
+      <h2>{usuario.id_usuario ? 'Editar Usuario' : 'Crear Usuario'}</h2>
       <input
         name="nombre"
         value={usuario.nombre}
@@ -46,18 +57,14 @@ export default function UsuarioForm({ onUsuarioCreado }) {
         placeholder="Correo"
         required
       />
-
       <input
-  name="contraseña"
-  type="password"
-  value={usuario.contraseña}
-  onChange={handleChange}
-  placeholder="Contraseña"
-  required
-/>
-
-
-      
+        name="contraseña"
+        type="password"
+        value={usuario.contraseña}
+        onChange={handleChange}
+        placeholder="Contraseña"
+        required
+      />
       <input
         name="saldo_disponible"
         value={usuario.saldo_disponible}
@@ -65,7 +72,9 @@ export default function UsuarioForm({ onUsuarioCreado }) {
         type="number"
         placeholder="Saldo"
       />
-      <button type="submit">Crear</button>
+      <button type="submit">
+        {usuario.id_usuario ? 'Actualizar' : 'Crear'}
+      </button>
     </form>
   );
 }

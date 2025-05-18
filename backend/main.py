@@ -114,7 +114,7 @@ def getSports():
     session = SessionLocal()
     try:
         deportes = session.query(Deporte).all()
-        return jsonify([{"id": d.id_deporte, "nombre": d.nombre_deporte} for d in deportes])
+        return jsonify([{"id_deporte": d.id_deporte, "nombre_deporte": d.nombre_deporte} for d in deportes])
     except Exception as e:
         app.logger.error(f"Error en /getSports: {e}")
         return jsonify({"error": str(e)}), 500
@@ -137,28 +137,35 @@ def crear_deporte():
 
         return jsonify({'message': 'Deporte creado', 'id': nuevo_deporte.id_deporte}), 201
     except Exception as e:
-        print("Error en /createUser:", traceback.format_exc())
+        print("Error en /updateSport:", traceback.format_exc())
         return jsonify({'error': str(e)}), 400
     
 # Update a sport
 @app.route('/updateSport', methods=['PUT'])
 def actualizar_deporte():
-
+    session = SessionLocal()  # ✅ Crear una sesión local
     data = request.get_json()
     id_deporte = data.get('id_deporte')
 
     if not id_deporte:
+        session.close()
         return jsonify({'error': 'El id_deporte es requerido'}), 400
 
-    deporte = session.query(Deporte).get(id_deporte)
+    try:
+        deporte = session.query(Deporte).get(id_deporte)
 
-    if deporte:
-        deporte.nombre_deporte = data.get('nombre_deporte', deporte.nombre_deporte)
-        session.commit()
+        if deporte:
+            deporte.nombre_deporte = data.get('nombre_deporte', deporte.nombre_deporte)
+            session.commit()
+            return jsonify({'message': 'Deporte actualizado'}), 200
+        else:
+            return jsonify({'error': 'Deporte no encontrado'}), 404
+    except Exception as e:
+        session.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        session.close()  # ✅ Cerrar la sesión siempre
 
-        return jsonify({'message': 'Deporte actualizado'}), 200
-    else:
-        return jsonify({'error': 'Deporte no encontrado'}), 404
 
 # Delete a sport
 @app.route('/deleteSport', methods=['DELETE'])

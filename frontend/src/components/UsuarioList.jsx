@@ -1,22 +1,21 @@
-// src/components/UsuarioList.jsx
 import React, { useEffect, useState } from 'react';
 import UsuarioService from '../services/usuarioService';
 
-export default function UsuarioList({ recargar }) {
+export default function UsuarioList({ recargar, onEditarUsuario  }) {
   const [usuarios, setUsuarios] = useState([]);
 
-  useEffect(() => {
+ useEffect(() => {
     const cargarUsuarios = async () => {
       try {
         const data = await UsuarioService.getAllUsuarios();
         setUsuarios(data);
       } catch (error) {
-        console.error('Error al cargar usuarios:', error);
+        console.error('Error al cargar los usuarios:', error);
       }
     };
 
     cargarUsuarios();
-  }, [recargar]); // solo recarga si 'recargar' cambia
+  }, [recargar]);
 
   return (
     <div style={{ marginTop: '20px' }}>
@@ -25,6 +24,9 @@ export default function UsuarioList({ recargar }) {
         {usuarios.map((u) => (
           <li key={u.id_usuario}>
             {u.nombre} - {u.correo} - ${u.saldo_disponible}
+            <button onClick={() => onEditarUsuario(u)} style={{ marginLeft: '10px' }}>
+              Editar
+            </button>
           </li>
         ))}
       </ul>

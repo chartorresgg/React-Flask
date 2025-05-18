@@ -8,7 +8,9 @@ import DeporteList from './components/DeporteList';
 function App() {
 
   const [recargarUsuarios, setRecargarUsuarios] = useState(false);
+  const [usuarioEditar, setUsuarioEditar] = useState(null);
   const [recargarDeportes, setRecargarDeportes] = useState(false);
+  const [deporteEditar, setDeporteEditar] = useState(null);
 
 useEffect(() => {
   const delay = setTimeout(() => {
@@ -20,6 +22,7 @@ useEffect(() => {
 
   const handleUsuarioCreado = () => {
     setRecargarUsuarios(prev => !prev);
+    setUsuarioEditar(null); // limpiar edición al terminar
   };
 
   const handleDeporteCreado = () => {
@@ -30,13 +33,28 @@ useEffect(() => {
     <div style={{ padding: '20px' }}>
       <h1>Gestión de Usuarios y Deportes</h1>
 
-      <UsuarioForm onUsuarioCreado={handleUsuarioCreado} />
-      <UsuarioList recargar={recargarUsuarios} />
+      <UsuarioForm 
+      onUsuarioCreado={handleUsuarioCreado} 
+      usuarioEditar={usuarioEditar}
+        limpiarEdicion={() => setUsuarioEditar(null)}
+      
+      
+      />
+      <UsuarioList recargar={recargarUsuarios}
+      onEditarUsuario={(u) => setUsuarioEditar(u)} />
 
       <hr />
 
-      <DeporteForm onDeporteCreado={handleDeporteCreado} />
-      <DeporteList recargar={recargarDeportes} />
+     <DeporteForm
+  onDeporteCreado={handleDeporteCreado}
+  deporteEditar={deporteEditar}
+  limpiarEdicion={() => setDeporteEditar(null)}
+/>
+
+<DeporteList
+  recargar={recargarDeportes}
+  onEditarDeporte={(d) => setDeporteEditar(d)}
+/>
     </div>
   );
 }
