@@ -1,4 +1,4 @@
-from database.db import session  # Session to interact with the database
+
 from sqlalchemy import Column, Integer, String, Float # Import the necessary types for the columns
 from database.db import Base # Base class for the models
 

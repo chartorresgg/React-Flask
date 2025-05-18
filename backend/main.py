@@ -3,6 +3,11 @@ from sqlalchemy import text # Import text to execute raw SQL queries
 from typing import Optional # Import Optional for type hinting
 from flask_cors import CORS
 from sqlalchemy.exc import SQLAlchemyError
+import traceback
+import logging
+from database.db import SessionLocal
+from sqlalchemy import text
+
 
 # ================== Imports class from Model ====================
 from model.Deporte import Deporte
@@ -14,14 +19,17 @@ import database.db as db # Import the database connection and session
 
 # Create a Flask application instance
 app = Flask(__name__)
-CORS(app)  # ✅ Esto habilita CORS para todas las rutas
+CORS(app, origins=["http://localhost:5173"])  # ✅ Esto habilita CORS para todas las rutas
+logging.basicConfig(level=logging.INFO)
 # ================== Verify database connection ==================
 try:
-    db.session.execute(text('SELECT 1'))
-    print("Conexión exitosa a la base de datos.")
+    session = SessionLocal()
+    session.execute(text('SELECT 1'))
+    print("Conexión a la base de datos exitosa.")
 except Exception as e:
     print("Error al conectar a la base de datos:", e)
-    exit(1)
+finally:
+    session.close()
 
 # ================== USER CRUD ==================
 
@@ -29,7 +37,7 @@ except Exception as e:
 @app.route('/getUsers', methods=['GET']) # Annotate the route and method
 def get_usuarios():
 
-    usuarios = db.session.query(Usuario).all() # Query all users from the database
+    usuarios = session.query(Usuario).all() # Query all users from the database
     usuarios_dict = [u.to_dict() for u in usuarios] # Convert each user to a dictionary
 
     return jsonify(usuarios_dict), 200
@@ -42,18 +50,18 @@ def crear_usuario():
 
     try:
         nuevo_usuario = Usuario(
-            id_usuario=data['id_usuario'],
             nombre=data['nombre'],
             correo=data['correo'],
             contraseña=data['contraseña'],
             saldo_disponible=float(data['saldo_disponible'])
         )
 
-        db.session.add(nuevo_usuario) # Add the new user to the session
-        db.session.commit() # Commit the session to save the user to the database
+        session.add(nuevo_usuario) # Add the new user to the session
+        session.commit() # Commit the session to save the user to the database
 
         return jsonify({'message': 'Usuario creado', 'id': nuevo_usuario.id_usuario}), 201
     except Exception as e:
+        print("Error en /createUser:", traceback.format_exc())
         return jsonify({'error': str(e)}), 400
 
 # Update a user
@@ -66,14 +74,14 @@ def actualizar_usuario():
     if not id_usuario:
         return jsonify({'error': 'El id_usuario es requerido'}), 400
 
-    usuario = db.session.query(Usuario).get(id_usuario)
+    usuario = session.query(Usuario).get(id_usuario)
     if usuario:
         usuario.nombre = data.get('nombre', usuario.nombre)
         usuario.correo = data.get('correo', usuario.correo)
         usuario.contraseña = data.get('contraseña', usuario.contraseña)
         usuario.saldo_disponible = float(data.get('saldo_disponible', usuario.saldo_disponible))
 
-        db.session.commit()
+        session.commit()
 
         return jsonify({'message': 'Usuario actualizado'}), 200
     else:
@@ -89,10 +97,10 @@ def eliminar_usuario():
     if not id_usuario:
         return jsonify({'error': 'El id_usuario es requerido'}), 400
 
-    usuario = db.session.query(Usuario).get(id_usuario)
+    usuario = session.query(Usuario).get(id_usuario)
     if usuario:
-        db.session.delete(usuario)
-        db.session.commit()
+        session.delete(usuario)
+        session.commit()
 
         return jsonify({'message': 'Usuario eliminado'}), 200
     else:
@@ -102,15 +110,16 @@ def eliminar_usuario():
 
 # Get all sports from the database
 @app.route('/getSports', methods=['GET'])
-def get_deportes():
+def getSports():
+    session = SessionLocal()
     try:
-        deportes = db.session.query(Deporte).all()
-        deportes_dict = [d.to_dict() for d in deportes]
-        return jsonify(deportes_dict), 200
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        print("Error en /getSports:", e)
-        return jsonify({'error': str(e)}), 500
+        deportes = session.query(Deporte).all()
+        return jsonify([{"id": d.id_deporte, "nombre": d.nombre_deporte} for d in deportes])
+    except Exception as e:
+        app.logger.error(f"Error en /getSports: {e}")
+        return jsonify({"error": str(e)}), 500
+    finally:
+        session.close()
 
 
 # Create a new sport
@@ -120,15 +129,15 @@ def crear_deporte():
     data = request.get_json()
     try:
         nuevo_deporte = Deporte(
-            id_deporte=data['id_deporte'],
             nombre_deporte=data['nombre_deporte']
         )
 
-        db.session.add(nuevo_deporte)
-        db.session.commit()
+        session.add(nuevo_deporte)
+        session.commit()
 
         return jsonify({'message': 'Deporte creado', 'id': nuevo_deporte.id_deporte}), 201
     except Exception as e:
+        print("Error en /createUser:", traceback.format_exc())
         return jsonify({'error': str(e)}), 400
     
 # Update a sport
@@ -141,11 +150,11 @@ def actualizar_deporte():
     if not id_deporte:
         return jsonify({'error': 'El id_deporte es requerido'}), 400
 
-    deporte = db.session.query(Deporte).get(id_deporte)
+    deporte = session.query(Deporte).get(id_deporte)
 
     if deporte:
         deporte.nombre_deporte = data.get('nombre_deporte', deporte.nombre_deporte)
-        db.session.commit()
+        session.commit()
 
         return jsonify({'message': 'Deporte actualizado'}), 200
     else:
@@ -161,14 +170,20 @@ def eliminar_deporte():
     if not id_deporte:
         return jsonify({'error': 'El id_deporte es requerido'}), 400
 
-    deporte = db.session.query(Deporte).get(id_deporte)
+    deporte = session.query(Deporte).get(id_deporte)
     if deporte:
-        db.session.delete(deporte)
-        db.session.commit()
+        session.delete(deporte)
+        session.commit()
 
         return jsonify({'message': 'Deporte eliminado'}), 200
     else:
         return jsonify({'error': 'Deporte no encontrado'}), 404
+
+
+
+@app.before_request
+def log_request_info():
+    app.logger.info(f'{request.method} {request.path} desde {request.remote_addr}')
 
 
 # ================= Main function ==================
@@ -177,4 +192,4 @@ def eliminar_deporte():
 if __name__ == '__main__':
     # Crear las tablas si no existen
     db.Base.metadata.create_all(db.engine)
-    app.run(debug=True, port=5000)
+    app.run(debug=True, use_reloader=True, port=5000)

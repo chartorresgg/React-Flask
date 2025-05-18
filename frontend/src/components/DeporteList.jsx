@@ -1,25 +1,25 @@
 // src/components/DeporteList.jsx
-import { useEffect, useState } from 'react'
-import { getDeportes } from '../services/deporteService'
+import React, { useEffect, useState } from 'react';
+import { getDeportes } from '../services/deporteService';
 
-export default function DeporteList() {
-  const [deportes, setDeportes] = useState([])
+export default function DeporteList({ recargar }) {
+  const [deportes, setDeportes] = useState([]);
 
   useEffect(() => {
     const fetchDeportes = async () => {
       try {
-        const data = await getDeportes()
-        setDeportes(data)
+        const data = await getDeportes();
+        setDeportes(data);
       } catch (error) {
-        console.error('Error al cargar deportes:', error)
+        console.error('Error al cargar deportes:', error);
       }
-    }
+    };
 
-    fetchDeportes()
-  }, [])
+    fetchDeportes();
+  }, [recargar]); // solo recarga si cambia la prop
 
   return (
-    <div>
+    <div style={{ marginTop: '20px' }}>
       <h2>Lista de Deportes</h2>
       <ul>
         {deportes.map((deporte) => (
@@ -27,5 +27,5 @@ export default function DeporteList() {
         ))}
       </ul>
     </div>
-  )
+  );
 }

@@ -10,8 +10,7 @@ from sqlalchemy.orm import sessionmaker # This is used to create a session to in
 connection_string = "mysql+mysqlconnector://root:Thommy1945*@localhost:3306/poli_apuestas"
 engine = create_engine(connection_string, echo=True, pool_pre_ping=True) # This creates a connection to the database. The echo=True parameter will log all the SQL statements that are
 
-Session = sessionmaker(bind=engine) # This creates a session factory that will be used to create sessions.
-session = Session() # This creates a active session that will be used to interact with the database.
+SessionLocal  = sessionmaker(autocommit=False, autoflush=False, bind=engine) # This creates a session factory that will be used to create sessions.
 
 # This is the base class for the models. All models should inherit from this class.
 Base = declarative_base()

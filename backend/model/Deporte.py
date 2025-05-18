@@ -1,4 +1,4 @@
-from database.db import session  # Session to interact with the database
+
 from sqlalchemy import Column, Integer, String, Float # Import the necessary types for the columns
 from database.db import Base # Base class for the models
 
@@ -11,8 +11,7 @@ class Deporte(Base):
     nombre_deporte = Column(String(100), nullable=False)
 
     # Constructor to initialize the object
-    def __init__(self, id_deporte, nombre_deporte):
-        self.id_deporte = id_deporte
+    def __init__(self, nombre_deporte):
         self.nombre_deporte = nombre_deporte
 
     # Method to represent the object as a string
