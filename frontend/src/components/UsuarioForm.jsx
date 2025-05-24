@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { TextField, Button, Box, Typography } from '@mui/material';
 import UsuarioService from '../services/usuarioService';
 
 export default function UsuarioForm({ onUsuarioCreado, usuarioEditar, limpiarEdicion }) {
@@ -8,6 +9,7 @@ export default function UsuarioForm({ onUsuarioCreado, usuarioEditar, limpiarEdi
     contraseña: '',
     saldo_disponible: 0,
   });
+
 useEffect(() => {
     if (usuarioEditar) {
       setUsuario(usuarioEditar);
@@ -40,41 +42,49 @@ useEffect(() => {
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
-      <h2>{usuario.id_usuario ? 'Editar Usuario' : 'Crear Usuario'}</h2>
-      <input
+    return (
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 400 }}
+    >
+      <Typography variant="h6">
+        {usuario.id_usuario ? 'Editar Usuario' : 'Crear Usuario'}
+      </Typography>
+
+      <TextField
         name="nombre"
         value={usuario.nombre}
         onChange={handleChange}
-        placeholder="Nombre"
+        label="Nombre"
         required
       />
-      <input
+      <TextField
         name="correo"
         value={usuario.correo}
         onChange={handleChange}
-        placeholder="Correo"
+        label="Correo"
+        type="email"
         required
       />
-      <input
+      <TextField
         name="contraseña"
         type="password"
         value={usuario.contraseña}
         onChange={handleChange}
-        placeholder="Contraseña"
+        label="Contraseña"
         required
       />
-      <input
+      <TextField
         name="saldo_disponible"
         value={usuario.saldo_disponible}
         onChange={handleChange}
+        label="Saldo disponible"
         type="number"
-        placeholder="Saldo"
       />
-      <button type="submit">
+      <Button variant="contained" type="submit" color="primary">
         {usuario.id_usuario ? 'Actualizar' : 'Crear'}
-      </button>
-    </form>
+      </Button>
+    </Box>
   );
 }

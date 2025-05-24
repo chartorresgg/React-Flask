@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { TextField, Button, Box, Typography } from '@mui/material';
 import DeporteService from '../services/deporteService';
 
 export default function DeporteForm({ onDeporteCreado, deporteEditar, limpiarEdicion }) {
@@ -48,19 +49,28 @@ export default function DeporteForm({ onDeporteCreado, deporteEditar, limpiarEdi
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
-      <h2>{deporte.id_deporte ? 'Editar Deporte' : 'Agregar Deporte'}</h2>
-      <input
-        type="text"
-        name="nombre_deporte"  // ✅ Necesario para que `handleChange` funcione
+
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 400 }}
+    >
+      <Typography variant="h6">
+        {deporte.id_deporte ? 'Editar Deporte' : 'Crear Deporte'}
+      </Typography>
+
+      <TextField 
+        name="nombre_deporte"
         value={deporte.nombre_deporte}
         onChange={handleChange}
-        placeholder="Nombre del deporte"
+        label="Nombre del Deporte"
         required
       />
-      <button type="submit">
-        {deporteEditar ? 'Actualizar' : 'Guardar'}
-      </button>
-    </form>
+
+      <Button type="submit" variant="contained" color="primary">
+        {deporte.id_deporte ? 'Actualizar' : 'Crear'}
+      </Button>
+    </Box>
+  
   );
 }

@@ -30,8 +30,10 @@ useEffect(() => {
   };
 
   return (
+    
     <div style={{ padding: '20px' }}>
-      <h1>Gestión de Usuarios y Deportes</h1>
+      
+      <h1 class="text-2xl font-bold mb-4">Gestión de Usuarios y Deportes</h1>
 
       <UsuarioForm 
       onUsuarioCreado={handleUsuarioCreado} 
@@ -56,6 +58,7 @@ useEffect(() => {
   onEditarDeporte={(d) => setDeporteEditar(d)}
 />
     </div>
+
   );
 }
 
