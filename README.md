@@ -32,7 +32,7 @@ La arquitectura sigue un modelo cliente-servidor que se comunica mediante una AP
 
 - **Lenguaje:** JavaScript
 - **Librerías principales:** React 19, ReactDOM
-- **Herramientas:** Vite, Tailwind CSS, ESLint
+- **Herramientas:** Vite, Material UI, ESLint
 - **Componentes:**
 
   - `App.jsx`: Componente principal donde se integran formularios y listas.
