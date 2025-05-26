@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import UsuarioService from '../services/usuarioService';
 import {
-  Grid, Paper, Typography, IconButton, Dialog, DialogTitle,
-  DialogContent, DialogContentText, DialogActions, Button
+  Grid, Card, CardContent, Typography, IconButton,
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Box
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -21,7 +21,6 @@ export default function UsuarioList({ recargar, onEditarUsuario }) {
         console.error('Error al cargar los usuarios:', error);
       }
     };
-
     cargarUsuarios();
   }, [recargar]);
 
@@ -33,30 +32,29 @@ export default function UsuarioList({ recargar, onEditarUsuario }) {
   };
 
   return (
-    <div style={{ marginTop: '20px' }}>
-      <Typography variant="h5" gutterBottom>Lista de Usuarios</Typography>
-      <Grid container spacing={2}>
+    <Box sx={{ mt: 4 }}>
+      <Typography variant="h5" align="center" gutterBottom>
+        Lista de Usuarios
+      </Typography>
+      <Grid container spacing={3}>
         {usuarios.map((u) => (
           <Grid item xs={12} sm={6} md={4} key={u.id_usuario}>
-            <Paper elevation={3} style={{ padding: '16px', position: 'relative' }}>
-              <Typography variant="subtitle1">{u.nombre}</Typography>
-              <Typography variant="body2">{u.correo}</Typography>
-              <Typography variant="body2">Saldo: ${u.saldo_disponible}</Typography>
-              <div style={{ position: 'absolute', top: 8, right: 8 }}>
-                <IconButton onClick={() => onEditarUsuario(u)}>
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  color="error"
-                  onClick={() => {
-                    setUsuarioAEliminar(u);
-                    setDialogOpen(true);
-                  }}
-                >
+            <Card sx={{ position: 'relative', p: 2 }}>
+              <CardContent>
+                <Typography variant="subtitle1">{u.nombre}</Typography>
+                <Typography variant="body2">{u.correo}</Typography>
+                <Typography variant="body2">Saldo: ${u.saldo_disponible}</Typography>
+              </CardContent>
+              <Box position="absolute" top={8} right={8}>
+                <IconButton onClick={() => onEditarUsuario(u)}><EditIcon /></IconButton>
+                <IconButton color="error" onClick={() => {
+                  setUsuarioAEliminar(u);
+                  setDialogOpen(true);
+                }}>
                   <DeleteIcon />
                 </IconButton>
-              </div>
-            </Paper>
+              </Box>
+            </Card>
           </Grid>
         ))}
       </Grid>
@@ -73,6 +71,6 @@ export default function UsuarioList({ recargar, onEditarUsuario }) {
           <Button onClick={handleEliminar} color="error">Eliminar</Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 }

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { Box } from '@mui/material';
+
 import DeporteService from '../services/deporteService';
 import {
-  Grid, Paper, Typography, IconButton, Dialog, DialogTitle, DialogActions,
-  Button, DialogContent, DialogContentText
+  Grid, Card, CardContent, Typography, IconButton, Dialog, DialogTitle,
+  DialogActions, Button, DialogContent, DialogContentText
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -21,7 +23,6 @@ export default function DeporteList({ recargar, onEditarDeporte }) {
         console.error('Error al cargar los deportes:', error);
       }
     };
-
     fetchDeportes();
   }, [recargar]);
 
@@ -33,28 +34,23 @@ export default function DeporteList({ recargar, onEditarDeporte }) {
   };
 
   return (
-    <div style={{ marginTop: '20px' }}>
-      <Typography variant="h5" gutterBottom>Lista de Deportes</Typography>
-      <Grid container spacing={2}>
+    <>
+      <Typography variant="h5" align="center" sx={{ my: 4 }}>Lista de Deportes</Typography>
+      <Grid container spacing={3}>
         {deportes.map((deporte) => (
           <Grid item xs={12} sm={6} md={4} key={deporte.id_deporte}>
-            <Paper elevation={3} style={{ padding: '16px', position: 'relative' }}>
-              <Typography variant="subtitle1">{deporte.nombre_deporte}</Typography>
-              <div style={{ position: 'absolute', top: 8, right: 8 }}>
-                <IconButton onClick={() => onEditarDeporte(deporte)}>
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  color="error"
-                  onClick={() => {
+            <Card sx={{ p: 2, position: 'relative' }}>
+              <CardContent>
+                <Typography variant="subtitle1">{deporte.nombre_deporte}</Typography>
+                <Box position="absolute" top={8} right={8}>
+                  <IconButton onClick={() => onEditarDeporte(deporte)}><EditIcon /></IconButton>
+                  <IconButton color="error" onClick={() => {
                     setDeporteAEliminar(deporte);
                     setDialogOpen(true);
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </div>
-            </Paper>
+                  }}><DeleteIcon /></IconButton>
+                </Box>
+              </CardContent>
+            </Card>
           </Grid>
         ))}
       </Grid>
@@ -63,7 +59,7 @@ export default function DeporteList({ recargar, onEditarDeporte }) {
         <DialogTitle>Confirmar eliminación</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            ¿Estás seguro que deseas eliminar el deporte "{deporteAEliminar?.nombre_deporte}"?
+            ¿Eliminar el deporte "{deporteAEliminar?.nombre_deporte}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -71,6 +67,6 @@ export default function DeporteList({ recargar, onEditarDeporte }) {
           <Button onClick={handleEliminar} color="error">Eliminar</Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 }
