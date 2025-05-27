@@ -5,7 +5,7 @@
 PoliApuestas es una aplicación web desarrollada como proyecto académico que permite la gestión de usuarios y deportes. El sistema está dividido en dos componentes principales:
 
 - **Backend** desarrollado con **Python**, **Flask** y **SQLAlchemy**.
-- **Frontend** desarrollado con **React**, **Vite** y **Material UI**.
+- **Frontend** desarrollado con **React**, **Vite** y **Material UI**, Fetch API.
 
 La arquitectura sigue un modelo cliente-servidor que se comunica mediante una API REST.
 
